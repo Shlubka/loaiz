@@ -71,22 +71,28 @@ impl BinaryTree {
         }
     }
 
-    fn search(&self, data: i32) -> i32 {
-        Self::search_for_data(&self.root, data)
+    fn search(&mut self, data: i32) -> i32 {
+        let mut count = 0;
+        self.root = Self::search_and_remove(self.root.take(), data, &mut count);
+        count
     }
 
-    fn search_for_data(node: &Link, data: i32) -> i32 {
+    fn search_and_remove(node: Link, data: i32, count: &mut i32) -> Link {
         match node {
             Some(n) => {
-                let mut count = 0;
-                if n.borrow().data == data {
-                    count += 1;
+                if n.borrow().data == data && *count == 0 {
+                    *count += 1;
+                    return None; // Удаляем узел, если найден дубликат
                 }
-                count += Self::search_for_data(&n.borrow().left, data);
-                count += Self::search_for_data(&n.borrow().right, data);
-                count
+                let left_child = n.borrow_mut().left.take();
+                n.borrow_mut().left = Self::search_and_remove(left_child, data, count);
+                if *count == 0 {
+                    let right_child = n.borrow_mut().right.take();
+                    n.borrow_mut().right = Self::search_and_remove(right_child, data, count);
+                }
+                Some(n)
             }
-            None => 0,
+            None => None,
         }
     }
 }
