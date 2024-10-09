@@ -39,10 +39,29 @@ fn create_and_fill_graph(size: usize) -> Vec<Vec<u8>> {
     graf
 }
 
+fn create_incidence_matrix(graf: &Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+    let size = graf.len();
+    let mut matrix = vec![vec![0u8; size * (size - 1) / 2]; size];
+    let mut index = 0;
+
+    for i in 0..size {
+        for j in i + 1..size {
+            if graf[i][j] == 1 {
+                matrix[i][index] = 1;
+                matrix[j][index] = 1;
+                index += 1;
+            }
+        }
+    }
+
+    matrix
+}
+
 fn main() {
     print!("Enter graff size, more then 0 (one number for line and colum) > ");
     let size = read_from_keyboard().unwrap_or(10);
     let graf = create_and_fill_graph(size as usize);
+    let matrix = create_incidence_matrix(&graf);
     let mut iter = 0;
     for row in &graf {
         iter += 1;
@@ -63,5 +82,10 @@ fn main() {
         } else {
             println!();
         }
+    }
+
+    println!("matrix");
+    for row in &matrix {
+        println!("{row:?} ");
     }
 }
